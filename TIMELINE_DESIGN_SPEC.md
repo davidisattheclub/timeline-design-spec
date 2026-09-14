@@ -1,4 +1,3 @@
-```markdown
 # Timeline Design Spec — Case Timeline Feature (Phase 1)
 
 **Version:** 1.0  
@@ -129,139 +128,128 @@ source_system          string (which system recorded this: claim_files_registry,
 #### Event Types & Type-Specific Fields
 
 **1. DOCUMENT_UPLOADED** `[DOCUMENTATION]`
-```
-document_id            string (unique identifier in source system)
-filename               string (original filename)
-document_type          enum (journal, receipt, prescription, form, email, other)
-uploaded_by            enum (Kunde | Handler | System)
-file_size              integer (bytes)
-reference_document_url string (link to open PDF/image)
-source_system          claim_files_registry
-```
+
+- document_id: unique identifier in source system
+- filename: original filename
+- document_type: enum (journal, receipt, prescription, form, email, other)
+- uploaded_by: enum (Kunde | Handler | System)
+- file_size: integer (bytes)
+- reference_document_url: link to open PDF/image
+- source_system: claim_files_registry
 
 Example: "Invoice_July_2026.pdf (Invoice) lastet opp av John Doe"
 
 ---
 
 **2. NOTE_ADDED** `[COMMUNICATION]`
-```
-note_id                string
-note_text              string (full text, searchable)
-note_type              enum (handler_internal | customer_facing | vet_communication)
-visibility             enum (handler_only | visible_to_customer)
-source_system          case_notes
-```
+
+- note_id: string
+- note_text: string (full text, searchable)
+- note_type: enum (handler_internal | customer_facing | vet_communication)
+- visibility: enum (handler_only | visible_to_customer)
+- source_system: case_notes
 
 Example: "Saksbehandler skrev notat" (expandable to show full note)
 
 ---
 
 **3. STATUS_CHANGED** `[CASE_MANAGEMENT]`
-```
-from_status            enum (Assigned, Waiting for Documents, Ready for Payout, etc.)
-to_status              enum (same as above)
-reason                 string (optional: why the change)
-source_system          salesforce
-```
+
+- from_status: enum (Assigned, Waiting for Documents, Ready for Payout, etc.)
+- to_status: enum (same as above)
+- reason: string (optional: why the change)
+- source_system: salesforce
 
 Example: "Status endret fra 'Waiting for Documents' til 'Ready for Payout'"
 
 ---
 
 **4. DECISION_MADE** `[DECISION]`
-```
-decision_type          enum (payout_approved | payout_partial | payout_rejected)
-payout_amount          integer (NOK)
-decision_summary       string (why — e.g., "Diseased teeth not covered per DYR04")
-reference_document_url string (link to handler's calculation/notes)
-source_system          case_notes or inservio
-```
+
+- decision_type: enum (payout_approved | payout_partial | payout_rejected)
+- payout_amount: integer (NOK)
+- decision_summary: string (why — e.g., "Diseased teeth not covered per DYR04")
+- reference_document_url: link to handler's calculation/notes
+- source_system: case_notes or inservio
 
 Example: "Utbetalingsbeslutning: 15 000 NOK godkjent"
 
 ---
 
 **5. CASE_MERGED** `[CASE_MANAGEMENT]`
-```
-merged_from_case_id    string
-merged_into_case_id    string
-reason                 enum (recurring_condition | duplicate | policy_adjustment | other)
-source_system          salesforce
-```
+
+- merged_from_case_id: string
+- merged_into_case_id: string
+- reason: enum (recurring_condition | duplicate | policy_adjustment | other)
+- source_system: salesforce
 
 Example: "Sak merged with CASE-67890 (recurring condition)"
 
 ---
 
 **6. VET_COMMUNICATION** `[COMMUNICATION]`
-```
-communication_type     enum (email_sent | email_received | phone_call | sms)
-vet_clinic_name        string
-message_preview        string (first 80 chars of email body)
-reference_document_url string (full email thread)
-source_system          email_system or case_notes
-```
+
+- communication_type: enum (email_sent | email_received | phone_call | sms)
+- vet_clinic_name: string
+- message_preview: string (first 80 chars of email body)
+- reference_document_url: string (full email thread)
+- source_system: email_system or case_notes
 
 Example: "Email received from Clinic Oslo: 'Fracture vs disease breakdown...'"
 
 ---
 
 **7. SYSTEM_ACTION** `[SYSTEM]`
-```
-action_type            enum (inservio_evaluation | stp_auto_payout | documentation_request | other)
-action_result          enum (passed | failed | pending)
-details                string (system-generated notes)
-source_system          inservio
-```
+
+- action_type: enum (inservio_evaluation | stp_auto_payout | documentation_request | other)
+- action_result: enum (passed | failed | pending)
+- details: string (system-generated notes)
+- source_system: inservio
 
 Example: "Inservio evaluation: passed (auto-payout eligible)"
 
 ---
 
 **8. HANDLER_ASSIGNED** `[CASE_MANAGEMENT]`
-```
-new_handler_name       string
-previous_handler_name  string (optional, if reassigned)
-assignment_reason      enum (initial_assignment | reassignment | escalation)
-source_system          salesforce
-```
+
+- new_handler_name: string
+- previous_handler_name: string (optional, if reassigned)
+- assignment_reason: enum (initial_assignment | reassignment | escalation)
+- source_system: salesforce
 
 Example: "Sak assigned to Sarah Hansen (reassigned from John Doe)"
 
 ---
 
 **9. DENTAL_VET_CONTACTED** `[COMMUNICATION]` (Dental-specific)
-```
-vet_clinic_name        string
-contact_method         enum (email | phone | form)
-question_type          enum (fracture_vs_disease | cost_breakdown | treatment_plan)
-source_system          case_notes
-```
+
+- vet_clinic_name: string
+- contact_method: enum (email | phone | form)
+- question_type: enum (fracture_vs_disease | cost_breakdown | treatment_plan)
+- source_system: case_notes
 
 Example: "Kontaktet Oslo Dyreklinikk: spørsmål om brekk vs sykdom"
 
 ---
 
 **10. DENTAL_VET_RESPONSE** `[COMMUNICATION]` (Dental-specific)
-```
-vet_clinic_name        string
-response_content       string (summary of vet's answer)
-cost_breakdown_pct     integer (% of treatment cost if provided)
-reference_document_url string (link to vet response email)
-source_system          email_system
-```
+
+- vet_clinic_name: string
+- response_content: string (summary of vet's answer)
+- cost_breakdown_pct: integer (% of treatment cost if provided)
+- reference_document_url: string (link to vet response email)
+- source_system: email_system
 
 Example: "Svar fra vet: 60% treatment cost, fracture confirmed"
 
 ---
 
 **11. DENTAL_CALCULATION_UPDATED** `[DECISION]` (Dental-specific)
-```
-previous_amount        integer (NOK)
-new_amount             integer (NOK)
-reason                 string (why recalculation: vet response, policy clarification, etc.)
-source_system          case_notes
-```
+
+- previous_amount: integer (NOK)
+- new_amount: integer (NOK)
+- reason: string (why recalculation: vet response, policy clarification, etc.)
+- source_system: case_notes
 
 Example: "Beregning oppdatert basert på veterinær-svar: 8 500 NOK → 12 000 NOK"
 
@@ -518,32 +506,8 @@ Desktop only for Phase 1. Mobile responsiveness planned for Phase 2.
         "reference_document_url": "https://skade.assistent/docs/DOC-456"
       },
       "source_system": "claim_files_registry"
-    },
-    {
-      "event_id": "EVT-002",
-      "timestamp": "2026-07-26T14:32:00Z",
-      "event_type": "DECISION_MADE",
-      "event_classification": "DECISION",
-      "actor": "System: Inservio",
-      "actor_reference": "inservio",
-      "short_descriptor": "15 000 NOK godkjent (Confidence: 92%)",
-      "details_json": {
-        "decision_type": "payout_approved",
-        "payout_amount": 15000,
-        "decision_summary": "Diseased teeth excluded per DYR04",
-        "reference_document_url": "https://skade.assistent/cases/CASE-12345/decisions/DECISION-789"
-      },
-      "source_system": "inservio"
     }
   ]
-}
-```
-
-**Error Response:**
-```json
-{
-  "error": "Could not load timeline",
-  "message": "Kunne ikke laste tidslinja. Prøv igjen senere."
 }
 ```
 
@@ -559,15 +523,11 @@ The timeline system **reads from** (no modifications to) these source systems:
 - **Frequency:** On-demand (when handler opens case)
 - **Integration:** Snowflake table query
 
----
-
 ### 2. Case Notes System (`case_notes` database)
 - **What:** Handler-added notes, status changes, communication records
 - **Data used:** note_id, note_text, note_type, visibility, created_by, created_at, status_old, status_new
 - **Frequency:** On-demand
 - **Integration:** Snowflake table query
-
----
 
 ### 3. Salesforce (Case & Policy History)
 - **What:** Case status changes, policy updates, handler assignments
@@ -575,15 +535,11 @@ The timeline system **reads from** (no modifications to) these source systems:
 - **Frequency:** On-demand (via Salesforce API or Snowflake replica)
 - **Integration:** Snowflake table query or Salesforce API
 
----
-
 ### 4. Email & Vet Communication System
 - **What:** Emails sent/received with vets, customers, external parties
 - **Data used:** email_timestamp, sender, recipient, subject, body_preview, thread_id
 - **Frequency:** On-demand
 - **Integration:** Email archive or Snowflake table
-
----
 
 ### 5. Inservio (AI Decision System)
 - **What:** AI payout decisions, evaluations, auto-actions
@@ -597,48 +553,18 @@ The timeline system **reads from** (no modifications to) these source systems:
 
 ### Module Layout (OPEN for implementation discussion with Morten)
 
-Suggested structure, following P1 (Code locality) principle:
-
 ```
 timeline/
-├── models.py
-│   └── TimelineEvent (Pydantic: timestamp, event_type, actor, details_json, etc.)
-│       (NO imports of dagster, sqlalchemy, or case logic)
-│
-├── tables.py
-│   └── TimelineEventRecord (SQLModel, mapped to AI_CASE_TIMELINE_EVENTS)
-│       (NO business logic)
-│
-├── ops.py
-│   ├── fetch_case_timeline_events(case_id, event_type=None, date_from=None, date_to=None)
-│   ├── record_document_upload_event(case_id, document_id, filename, ...)
-│   ├── record_note_added_event(case_id, note_id, note_text, ...)
-│   └── record_status_change_event(case_id, from_status, to_status, ...)
-│       (Pure Dagster I/O, no business logic)
-│
-├── logic.py
-│   ├── validate_event_timestamp(timestamp) → bool
-│   ├── validate_event_sequence(events) → bool or ValidationError
-│   ├── order_events_by_timestamp(events) → sorted_list
-│   └── scrub_event_details(details_json) → sanitized_json
-│       (Pure Python, testable without database)
-│
-├── resource.py
-│   └── TimelineResource (manages DB connections, query builders)
-│       (Shared across timeline ops)
-│
-├── api_handlers.py
-│   └── get_case_timeline(case_id, filters) → JSON response
-│       (Flask/FastAPI endpoint handler)
-│
-└── tests/
-    ├── test_models.py
-    ├── test_logic.py
-    ├── test_ops.py
-    └── test_api_handlers.py
+├── models.py (TimelineEvent Pydantic model)
+├── tables.py (TimelineEventRecord SQLModel)
+├── ops.py (Dagster operations for fetching/recording events)
+├── logic.py (Pure Python business logic)
+├── resource.py (TimelineResource for DB connections)
+├── api_handlers.py (Flask/FastAPI endpoint handlers)
+└── tests/ (test_models.py, test_logic.py, test_ops.py, test_api_handlers.py)
 ```
 
-**Constraints (from P1 — Code locality):**
+**Constraints:**
 - `models.py` has NO imports of: `dagster`, `sqlalchemy`, `case` modules
 - `logic.py` has NO side effects, NO database access, NO Dagster imports
 - `ops.py` contains only Dagster I/O; business logic lives in `logic.py`
@@ -651,32 +577,30 @@ timeline/
 
 | # | Question | Owner | Options/Notes |
 |---|----------|-------|---------------|
-| **D1** | **Indexing strategy** | Lukasz/Sam | Recommend `(case_id, timestamp DESC)` + `(case_id, event_type)`. Agree or adjust? |
-| **D2** | **JSON vs. structured columns** | Lukasz/Sam | Store event details in `details_json`, or denormalize key columns? Align with your Snowflake conventions. |
-| **D3** | **Caching strategy** | Lukasz/Sam | No cache (fresh every time), Redis (5–10 min TTL), browser cache, or hybrid? SLA is <1 sec query time. |
-| **D4** | **Historical backfill** | Lukasz/Sam | Backfill all existing cases (one-time, high cost), backfill on-demand (lazy load), forward-only (clean start), or configurable? |
-| **D5** | **Event ID source** | Morten/Data | Use existing IDs from source tables (FILE_ID, RUN_ID, note_id) or generate new timeline-specific UUIDs? |
-| **D6** | **Color scheme (UI)** | Design | Confirm colors for event_classification: DOCUMENTATION (blue), DECISION (green), COMMUNICATION (orange), etc. |
-| **D7** | **Dental event priority** | Product | Should DENTAL_VET_CONTACTED, DENTAL_VET_RESPONSE, DENTAL_CALCULATION_UPDATED be in V1, or Phase 2? |
-| **D8** | **Error handling UI** | Product | Show generic error message "Kunne ikke laste tidslinja. Prøv igjen senere" to handler, or more detail? |
-| **D9** | **Logging & monitoring scope** | Morten/Data | Log query performance (time, row count, cost), errors, and usage (view counts, event type frequency)? |
-| **D10** | **Orchestration for Phase 1** | Lukasz | Since V1 is on-demand (no scheduled job), is a Dagster job needed? Or just on-demand API calls? |
+| D1 | **Indexing strategy** | Lukasz/Sam | Recommend `(case_id, timestamp DESC)` + `(case_id, event_type)`. Agree or adjust? |
+| D2 | **JSON vs. structured columns** | Lukasz/Sam | Store event details in `details_json`, or denormalize key columns? |
+| D3 | **Caching strategy** | Lukasz/Sam | No cache, Redis (5–10 min TTL), browser cache, or hybrid? SLA is <1 sec. |
+| D4 | **Historical backfill** | Lukasz/Sam | Backfill all cases, backfill on-demand, forward-only, or configurable? |
+| D5 | **Event ID source** | Morten/Data | Use existing IDs (FILE_ID, RUN_ID) or generate new timeline-specific UUIDs? |
+| D6 | **Color scheme (UI)** | Design | Confirm colors for event classifications (Blue, Green, Orange, Purple, Grey). |
+| D7 | **Dental events in V1** | Product | Should dental-specific events be in V1, or Phase 2? |
+| D8 | **Error handling UI** | Product | Generic error message or more detail? |
+| D9 | **Logging & monitoring** | Morten/Data | Query performance, errors, usage metrics? |
+| D10 | **Orchestration for Phase 1** | Lukasz | Dagster job needed, or just on-demand API calls? |
 
 ---
 
 ## Out of Scope / Future (Phase 2+)
 
-These features are explicitly NOT included in Phase 1 but planned for future iterations:
-
-- **Mobile & tablet responsiveness** — Phase 1 is desktop only
-- **Event editing/deletion** — Phase 1 is read-only immutable
-- **Event creation UI** — Handlers cannot add events manually in V1 (system-driven only)
-- **Additional event types** — Phases 2+: handler-added custom events, task assignments, reminders, etc.
-- **Advanced filtering** — Phase 2: full-text search, saved filters, bulk export
-- **Event notifications** — Phase 2: alert handler when new event arrives ("New document uploaded to your case")
-- **Timeline export/print** — Phase 2: PDF report or export to Excel
-- **Linked case visualization** — Phase 2: show timeline for related/merged cases in one view
-- **Custom event types** — Phase 2: allow admins to define new event types
+- Mobile & tablet responsiveness
+- Event editing/deletion
+- Event creation UI
+- Additional event types
+- Advanced filtering (full-text search, saved filters, bulk export)
+- Event notifications
+- Timeline export/print
+- Linked case visualization
+- Custom event types
 
 ---
 
@@ -684,41 +608,18 @@ These features are explicitly NOT included in Phase 1 but planned for future ite
 
 ### Quantitative Metrics
 
-1. **Context-gathering time reduced** — Handler gains full case context in ≤30 seconds (measure via user testing)
-2. **Timeline adoption** — ≥80% of handlers use timeline when opening a case (measure via analytics)
-3. **Query latency** — Timeline data loads in <1 second for 95th percentile of cases (measure via APM)
-4. **Completeness** — Timeline shows ≥95% of events from source systems (verify via data sampling)
+1. Context-gathering time reduced to ≤30 seconds
+2. Timeline adoption ≥80% of handlers
+3. Query latency <1 second for 95th percentile
+4. Completeness ≥95% of events captured
 
 ### Qualitative Feedback
 
-5. **Handler satisfaction** — Post-launch survey: "Timeline helps me understand case context faster" (target: ≥4/5 rating)
-6. **Handoff efficiency** — Handlers report easier case handoffs with timeline ("I can onboard on a case 5 min faster")
-7. **No event loss** — Zero reports of missing or incorrect events in first month (critical for compliance)
-
----
-
-## Appendix: Reference to Lukasz's Design Spec Pattern
-
-This spec follows the structure and rigor of **Lukasz's Settlement Error Analysis Spec**, adapted for a product feature:
-
-- **Purpose** (what problem it solves)
-- **Design Principles** (non-negotiable axioms, P1–P7)
-- **Core Concept** (the fundamental unit: Timeline Event)
-- **Functional Requirements** (FR1–FR8: what it MUST do)
-- **UI/UX Design** (handler use cases, layout, interaction)
-- **Data Model** (table schema, API contract)
-- **Dependencies** (source systems read from)
-- **Internal Structure** (module layout, with P1 constraints)
-- **Open Questions** (explicit trade-offs and decisions pending)
-- **Out of Scope** (what's NOT included)
-- **Success Criteria** (how we measure success)
+5. Handler satisfaction ≥4/5 rating
+6. Easier case handoffs reported
+7. Zero missing/incorrect events in first month
 
 ---
 
 **Status:** Ready for Lukasz/Sam + Design review on open items (D1–D10).  
 **Next Step:** Resolve open items; kick off implementation with Morten.
-```
-
-5. **Paste it** into the editor, then **Commit new file** → done.
-
-Done ✅
